@@ -1,62 +1,107 @@
 <template>
   <div id="app">
     <div class="todo-list">
-      <div v-for="user in component.users" class="todo-item" :key="user.id">
-          <div>{{user.shortInfo}}</div> 
-          <div class="todo-item-editor">
-            <input style="flex: 1;" type="text" :value="user.name" v-model="user.name" />
-            <input type="checkbox" v-model="user.adult">
-          </div>
-      </div>
+      <input id="undoneFirst" type="checkbox" v-model="component.undoneFirst">
+      <label for="undoneFirst">Show undone todos first</label>
+      <table>
+          <tr>
+            <th>Title</th>
+            <th>Description</th> 
+            <th>Done</th>
+          </tr>
+          <template v-if="component.undoneFirst">
+            <tr v-for="todo in component.undoneTodos" :key="todo.id">
+              <th>{{todo.title}}}</th>
+              <th>{{todo.description}}</th> 
+              <th><input type="checkbox" v-model="todo.done"></th>
+            </tr>
+            <tr v-for="todo in component.doneTodos" :key="todo.id">
+              <th>{{todo.title}}}</th>
+              <th>{{todo.description}}</th> 
+              <th><input type="checkbox" v-model="todo.done"></th>
+            </tr>
+
+          </template>
+          <template v-else >
+            <tr v-for="todo in component.doneTodos" :key="todo.id">
+              <th>{{todo.title}}}</th>
+              <th>{{todo.description}}</th> 
+              <th><input type="checkbox" v-model="todo.done"></th>
+            </tr>
+            <tr v-for="todo in component.undoneTodos" :key="todo.id">
+              <th>{{todo.title}}}</th>
+              <th>{{todo.description}}</th> 
+              <th><input type="checkbox" v-model="todo.done"></th>
+            </tr>
+          </template>
+          
+      </table>
     </div>
 
     <form class="new-todo" action="#">
-      <input type="text" placeholder="New user's name" v-model="newUserName" />
-      <button @click="createNewUser">New user</button>
+      <input type="text" placeholder="New todo's name" v-model="newTodoTitle" />
+      <textarea name="" id="" cols="10" rows="10" placeholder="Description" v-model="newTodoDescription"></textarea>
+      <button @click="createNewTodo">New Todo</button>
     </form>
   </div>
 </template>
 
 <script>
 import HelloWorld from "./components/HelloWorld";
-import Vibe from "vibe";
-import User from "../src/store/models/User";
-import Store from '../src/store/Store'
+import Vibe from "vibejs";
+import Todo from "../src/store/models/Todo";
+import Store from "../src/store/Store";
 
-const struct = new Vibe.Struct({
-  structure: {
-    users: Vibe.types.Array(Vibe.types.Reference(User.name))
+const types = Vibe.types;
+
+const struct = new Vibe.Struct(
+  {
+    structure: {
+      todos: types.Array(types.Reference(Todo.name)),
+      undoneFirst: types.Boolean
+    },
+    computed: {
+      doneTodos() {
+        return this.todos.filter(it => it.done);
+      },
+      undoneTodos() {
+        return this.todos.filter(it => !it.done);
+      }
+    }
   },
-  computed: {
-
-  }
-}, Store);
+  Store
+);
 
 export default {
   name: "app",
   data() {
     return {
       component: struct.observe(),
-      newUserName: ""
+      newTodoTitle: "",
+      newTodoDescription: ""
     };
   },
   mounted() {
     this.component.$observable.subscribe(_ => {
       this.$forceUpdate();
-    })
+    });
   },
   methods: {
-    createNewUser() {
+    createNewTodo() {
       const entity = {
         id: new Date().getTime(),
-        name: this.newUserName,
-        adult: true
-      }
-      User.insertEntity(entity);
-      this.component.users = this.component.users.concat([User.observe(entity.id)])
-      console.log(this.component.users);
+        title: this.newTodoTitle,
+        description: this.newTodoDescription,
+        done: false
+      };
+      Todo.insertEntity(entity);
+      this.component.todos = this.component.todos.concat([entity.id]);
+
+      console.log(this.component.todos);
+      this.newTodoDescription = "";
+      this.newTodoTitle = "";
     },
-    changeUserName(user, name){
+    changeUserName(user, name) {
       user.name = name;
     }
   },
@@ -65,31 +110,45 @@ export default {
 </script>
 
 <style>
-
-.todo-item{
+.todo-item {
   display: flex;
   flex-direction: column;
   margin-top: 10px;
 }
 
-.todo-item-editor{
+.todo-item-editor {
   display: flex;
   flex-direction: row;
   margin-top: 10px;
 }
-.todo-list{
+.todo-list {
   padding: 10px;
 }
 
-#app{
+#app {
   width: 500px;
   margin: auto;
   margin-top: 100px;
 }
 
-
-.new-todo{
+.new-todo {
   padding: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
+table {
+  width: 100%;
+}
+table,
+th,
+td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 5px;
+  text-align: left;
+}
 </style>

@@ -1,6 +1,6 @@
-import Vibe from 'vibe';
-import User from './models/User'
+import Vibe from 'vibejs';
+import Todo from './models/Todo'
 
 export default new Vibe.EntityStore([
-    User
+    Todo
 ]);
