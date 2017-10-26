@@ -1,5 +1,5 @@
 import Vibe from 'vibejs';
-import Todo from './models/Todo'
+import Todo from './model/Todo';
 
 export default new Vibe.EntityStore([
     Todo
