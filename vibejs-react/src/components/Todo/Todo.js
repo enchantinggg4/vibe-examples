@@ -16,6 +16,7 @@ class Todo extends PureComponent {
   renderTitle() {
     if (!this.state.editing) {
       return <div style={{
+        textDecoration: this.props.todo.done ? 'line-through' : 'none',
         fontSize: '20px',
         flex: 1
       }} onClick={t => this.setState({ editing: true })}>{this.props.todo.title}</div>
@@ -59,10 +60,12 @@ class Todo extends PureComponent {
         <div style={{
           marginRight: '10px'
         }}>
-          <FontAwesome
+          {
+            this.props.removable && <FontAwesome
             onClick={this.discardTodo.bind(this)} style={{ cursor: 'pointer' }}
             size='1x'
-            name='times' />
+            name='times' /> || null
+          }
         </div>
         <div style={{
           marginRight: '10px'

@@ -40,7 +40,7 @@ class App extends Component {
         <div>Done: {struct.doneTodos.length} / {struct.todos.length} </div>
         {
           struct.todos.map(todo => {
-            return <Todo key={todo.id} todo={todo} />
+            return <Todo removable={true} key={todo.id} todo={todo} />
           })
         }
 
@@ -48,7 +48,7 @@ class App extends Component {
 
 
         <hr/>
-
+        <h2>All todos pool</h2>
         <AllTodos />
       </div>
     );
